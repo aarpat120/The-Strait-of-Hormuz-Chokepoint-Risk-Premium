@@ -1,0 +1,163 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ==========================================
+# 1. LOAD THE DATASET
+# ==========================================
+
+file_name = "The Strait of Hormuz Chokepoint Risk Premium - Data.csv"
+
+df = pd.read_csv(file_name)
+
+print("\nDataset loaded successfully!")
+
+# ==========================================
+# 2. BASIC INFORMATION
+# ==========================================
+
+print("\n========== FIRST 5 ROWS ==========")
+print(df.head())
+
+print("\n========== LAST 5 ROWS ==========")
+print(df.tail())
+
+print("\n========== DATASET SHAPE ==========")
+print("Rows:", df.shape[0])
+print("Columns:", df.shape[1])
+
+print("\n========== COLUMN NAMES ==========")
+print(df.columns.tolist())
+
+print("\n========== DATA TYPES ==========")
+print(df.dtypes)
+
+# ==========================================
+# 3. MISSING VALUES
+# ==========================================
+
+print("\n========== MISSING VALUES ==========")
+print(df.isnull().sum())
+
+print("\n========== MISSING VALUE PERCENTAGE ==========")
+print((df.isnull().sum() / len(df) * 100).round(2))
+
+# ==========================================
+# 4. DUPLICATES
+# ==========================================
+
+print("\n========== DUPLICATES ==========")
+print("Number of duplicate rows:", df.duplicated().sum())
+
+# ==========================================
+# 5. SUMMARY STATISTICS
+# ==========================================
+
+print("\n========== SUMMARY STATISTICS ==========")
+print(df.describe(include="all"))
+
+# ==========================================
+# 6. UNIQUE VALUES
+# ==========================================
+
+print("\n========== UNIQUE VALUES ==========")
+
+for column in df.columns:
+    print(f"\n{column}:")
+    print("Unique values:", df[column].nunique())
+
+# ==========================================
+# 7. NUMERICAL COLUMNS
+# ==========================================
+
+numeric_columns = df.select_dtypes(include="number").columns
+
+print("\n========== NUMERICAL COLUMNS ==========")
+print(list(numeric_columns))
+
+# ==========================================
+# 8. HISTOGRAMS
+# ==========================================
+
+if len(numeric_columns) > 0:
+
+    df[numeric_columns].hist(
+        figsize=(15, 10),
+        bins=30
+    )
+
+    plt.suptitle("Distribution of Numerical Variables")
+    plt.tight_layout()
+    plt.show()
+
+# ==========================================
+# 9. BOX PLOTS
+# ==========================================
+
+if len(numeric_columns) > 0:
+
+    plt.figure(figsize=(12, 6))
+
+    sns.boxplot(data=df[numeric_columns])
+
+    plt.title("Boxplots of Numerical Variables")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# ==========================================
+# 10. CORRELATION MATRIX
+# ==========================================
+
+if len(numeric_columns) > 1:
+
+    correlation = df[numeric_columns].corr()
+
+    print("\n========== CORRELATION MATRIX ==========")
+    print(correlation)
+
+    plt.figure(figsize=(12, 8))
+
+    sns.heatmap(
+        correlation,
+        annot=True,
+        cmap="coolwarm",
+        fmt=".2f"
+    )
+
+    plt.title("Correlation Matrix")
+    plt.tight_layout()
+    plt.show()
+
+# ==========================================
+# 11. TIME-SERIES CHECK
+# ==========================================
+
+print("\n========== CHECKING FOR DATE COLUMNS ==========")
+
+for column in df.columns:
+
+    if "date" in column.lower() or "time" in column.lower():
+
+        print(f"Possible date column found: {column}")
+
+        try:
+            df[column] = pd.to_datetime(df[column])
+
+            print(f"{column} successfully converted to datetime.")
+
+            print("Earliest date:", df[column].min())
+            print("Latest date:", df[column].max())
+
+        except:
+            print(f"Could not convert {column} to datetime.")
+
+# ==========================================
+# 12. DATASET INFORMATION
+# ==========================================
+
+print("\n========== FINAL DATASET INFO ==========")
+
+df.info()
+
+print("\n========== EDA COMPLETE ==========")
